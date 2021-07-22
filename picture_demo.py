@@ -30,7 +30,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--cfg', help='experiment configure file name',
                     default='vgg19_368x368_sgd.yaml', type=str)
 parser.add_argument('--weight', type=str,
-                    default='best_pose_quant.pth')
+                    default='pose_model.pth')
 parser.add_argument('opts',
                     help="Modify config options using the command-line",
                     default=None,
@@ -45,18 +45,19 @@ update_config(cfg, args)
 model = get_model('vgg19')     
 w1 = torch.load(args.weight, map_location='cpu')
 
+"""
 from collections import OrderedDict
 w2 = OrderedDict()
 for k, v in w1.items():
     name = k[7:]
     w2[name] = v
-
-model.load_state_dict(w2)
+"""
+model.load_state_dict(w1)
 #model = torch.nn.DataParallel(model).cuda()
 model.float()
 model.eval()
 
-test_image = 'test1.jpg'
+test_image = 'test3.jpg'
 oriImg = cv2.imread(test_image) # B,G,R order
 shape_dst = np.min(oriImg.shape[0:2])
 
@@ -69,5 +70,5 @@ print(im_scale)
 humans = paf_to_pose_cpp(heatmap, paf, cfg)
         
 out = draw_humans(oriImg, humans)
-cv2.imwrite('result1.png',out)   
+cv2.imwrite('result3.png',out)   
 
